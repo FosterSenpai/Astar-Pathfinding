@@ -27,15 +27,6 @@
     <ClCompile Include="c_graph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="c_dfs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="c_bfs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="c_a_star.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="c_dungeon_map.h">
@@ -43,18 +34,6 @@
     </ClInclude>
     <ClInclude Include="c_graph.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="c_base_search.h">
-      <Filter>Header Files\Algorithms</Filter>
-    </ClInclude>
-    <ClInclude Include="c_dfs.h">
-      <Filter>Header Files\Algorithms</Filter>
-    </ClInclude>
-    <ClInclude Include="c_bfs.h">
-      <Filter>Header Files\Algorithms</Filter>
-    </ClInclude>
-    <ClInclude Include="c_a_star.h">
-      <Filter>Header Files\Algorithms</Filter>
     </ClInclude>
     <ClInclude Include="c_node.h">
       <Filter>Header Files</Filter>

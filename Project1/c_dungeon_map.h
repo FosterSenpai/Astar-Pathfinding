@@ -55,6 +55,18 @@ public:
      */
     c_graph to_graph() const;
 
+	/**
+     * @brief Get the start node position.
+     * @return A pair of integers representing the start node position.
+     */
+    std::pair<int, int> get_start_node() const;
+
+    /**
+     * @brief Get the end node position.
+     * @return A pair of integers representing the end node position.
+     */
+    std::pair<int, int> get_end_node() const;
+
 private:
     std::vector<std::vector<char>> map_; // Map data stored as a 2D vector.
     std::string original_filename_;      // Need for new save file name.

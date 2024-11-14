@@ -127,18 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="c_a_star.cpp" />
-    <ClCompile Include="c_bfs.cpp" />
-    <ClCompile Include="c_dfs.cpp" />
     <ClCompile Include="c_dungeon_map.cpp" />
     <ClCompile Include="c_graph.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="c_a_star.h" />
-    <ClInclude Include="c_base_search.h" />
-    <ClInclude Include="c_bfs.h" />
-    <ClInclude Include="c_dfs.h" />
     <ClInclude Include="c_dungeon_map.h" />
     <ClInclude Include="c_graph.h" />
     <ClInclude Include="c_node.h" />

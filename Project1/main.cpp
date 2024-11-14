@@ -2,9 +2,6 @@
 #include <limits>
 #include "c_dungeon_map.h"
 #include "c_graph.h"
-#include "c_dfs.h"
-#include "c_bfs.h"
-#include "c_a_star.h"
 
 void display_map(const c_dungeon_map& map) {
     map.display_map();
@@ -37,23 +34,47 @@ void handle_user_input(const int choice, c_dungeon_map& map, c_graph& graph) {
                 map.load_map(filename);
                 map.verify_map();
                 std::cout << "Map loaded and verified successfully.\n";
+                graph = map.to_graph(); // Convert the map to a graph
             } catch (const std::exception& e) {
                 std::cerr << "Error loading map: " << e.what() << '\n';
             }
             break;
         }
 
-        case 2:   // === Perform DFS ===
-            // TODO: Perform DFS
+        case 2: { // === Perform DFS ===
+            try {
+                auto start_pos = map.get_start_node();
+                Node start_node = graph.get_node(start_pos.first, start_pos.second);
+                graph.dfs(start_node);
+            } catch (const std::exception& e) {
+                std::cerr << "Error performing DFS: " << e.what() << '\n';
+            }
             break;
+        }
 
-        case 3:   // === Perform BFS ===
-            // TODO: Perform BFS
+        case 3: { // === Perform BFS ===
+            try {
+                auto start_pos = map.get_start_node();
+                Node start_node = graph.get_node(start_pos.first, start_pos.second);
+                graph.bfs(start_node);
+            } catch (const std::exception& e) {
+                std::cerr << "Error performing BFS: " << e.what() << '\n';
+            }
             break;
+        }
 
-        case 4:   // === Run A* algorithm ===
-            // TODO: Run A* algorithm
+        case 4: { // === Run A* algorithm ===
+            try {
+                auto start_pos = map.get_start_node();
+                auto end_pos = map.get_end_node();
+                Node start_node = graph.get_node(start_pos.first, start_pos.second);
+                Node end_node = graph.get_node(end_pos.first, end_pos.second);
+                graph.a_star(start_node, end_node);
+            } catch (const std::exception& e) {
+                std::cerr << "Error running A* algorithm: " << e.what() << '\n';
+            }
             break;
+        }
 
         case 5: { // === Save current map ===
             std::string save_filename;

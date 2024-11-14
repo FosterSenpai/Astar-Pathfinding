@@ -120,39 +120,27 @@ void c_dungeon_map::save_map(const std::string& new_filename) const {
 }
 
 c_graph c_dungeon_map::to_graph() const {
-    c_graph graph;
-    std::unordered_map<std::pair<int, int>, int, pair_hash> node_map;
+    return c_graph(map_);
+}
 
-    // Create nodes for each non-wall cell
+std::pair<int, int> c_dungeon_map::get_start_node() const {
     for (int i = 0; i < MAP_SIZE; ++i) {
         for (int j = 0; j < MAP_SIZE; ++j) {
-            if (map_[i][j] != 'w') {
-                int node_index = graph.add_node(i, j);
-                node_map[{i, j}] = node_index;
+            if (map_[i][j] == 's') {
+                return {i, j};
             }
         }
     }
+    throw std::runtime_error("Start node not found");
+}
 
-    // Add edges between neighboring nodes
+std::pair<int, int> c_dungeon_map::get_end_node() const {
     for (int i = 0; i < MAP_SIZE; ++i) {
         for (int j = 0; j < MAP_SIZE; ++j) {
-            if (map_[i][j] != 'w') {
-                int current_index = node_map[{i, j}];
-
-                // Check the right neighbor
-                if (j + 1 < MAP_SIZE && map_[i][j + 1] != 'w') {
-                    int right_index = node_map[{i, j + 1}];
-                    graph.add_edge(current_index, right_index);
-                }
-
-                // Check the bottom neighbor
-                if (i + 1 < MAP_SIZE && map_[i + 1][j] != 'w') {
-                    int bottom_index = node_map[{i + 1, j}];
-                    graph.add_edge(current_index, bottom_index);
-                }
+            if (map_[i][j] == 'x') {
+                return {i, j};
             }
         }
     }
-
-    return graph;
+    throw std::runtime_error("End node not found");
 }
