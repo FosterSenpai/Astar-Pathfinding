@@ -1,10 +1,33 @@
 ﻿#include "c_dungeon_map.h"
+#include "c_graph.h"
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
+#include <unordered_map>
 #include <unordered_set>
+#include <utility> // For std::pair
+#include <functional> // For std::hash
+
+struct pair_hash {
+    template <class T1, class T2>
+    std::size_t operator() (const std::pair<T1, T2>& pair) const {
+        return std::hash<T1>()(pair.first) ^ std::hash<T2>()(pair.second);
+    }
+};
 
 constexpr int MAP_SIZE = 20;
+
+c_dungeon_map::c_dungeon_map() {
+    map_.resize(MAP_SIZE, std::vector<char>(MAP_SIZE, '.')); // Initialize with empty cells.
+
+    // Set walls around the outside.
+    for (int i = 0; i < MAP_SIZE; ++i) {
+        map_[0][i] = 'w'; // Top row.
+        map_[MAP_SIZE - 1][i] = 'w'; // Bottom row.
+        map_[i][0] = 'w'; // Left column.
+        map_[i][MAP_SIZE - 1] = 'w'; // Right column.
+    }
+}
 
 c_dungeon_map::c_dungeon_map(const std::string& filename) : original_filename_(filename) {
     load_map(filename);
@@ -12,8 +35,12 @@ c_dungeon_map::c_dungeon_map(const std::string& filename) : original_filename_(f
 }
 
 void c_dungeon_map::load_map(const std::string& filename) {
+    // Strip quotation marks from the filename
+    std::string clean_filename = filename;
+    clean_filename.erase(remove(clean_filename.begin(), clean_filename.end(), '\"'), clean_filename.end());
+
     // Open the file, throw an exception if it fails.
-    std::ifstream file(filename);
+    std::ifstream file(clean_filename);
     if (!file.is_open()) {
         throw std::runtime_error("Unable to open file");
     }
@@ -67,20 +94,20 @@ void c_dungeon_map::display_map() const {
     }
 }
 
-void c_dungeon_map::save_map() const {
-    // Create a new filename by inserting "-searched" before the file extension.
-    std::string new_filename = original_filename_;
-    size_t dot_pos = new_filename.find_last_of('.');
-    if (dot_pos != std::string::npos) {
-        new_filename.insert(dot_pos, "-searched");
-    } else {
-        new_filename.append("-searched");
+void c_dungeon_map::save_map(const std::string& new_filename) const {
+    // Specify the directory where you want to save the file
+    std::string save_directory = "maps/";
+
+    // Ensure the filename has a .txt extension
+    std::string full_path = save_directory + new_filename;
+    if (full_path.find('.') == std::string::npos) {
+        full_path += ".txt";
     }
 
     // Make the new file.
-    std::ofstream file(new_filename);
+    std::ofstream file(full_path);
     if (!file.is_open()) {
-        throw std::runtime_error("Unable to open file");
+        throw std::runtime_error("Unable to create file");
     }
 
     // Write the map data to the new file.
@@ -90,4 +117,42 @@ void c_dungeon_map::save_map() const {
         }
         file << '\n';
     }
+}
+
+c_graph c_dungeon_map::to_graph() const {
+    c_graph graph;
+    std::unordered_map<std::pair<int, int>, int, pair_hash> node_map;
+
+    // Create nodes for each non-wall cell
+    for (int i = 0; i < MAP_SIZE; ++i) {
+        for (int j = 0; j < MAP_SIZE; ++j) {
+            if (map_[i][j] != 'w') {
+                int node_index = graph.add_node(i, j);
+                node_map[{i, j}] = node_index;
+            }
+        }
+    }
+
+    // Add edges between neighboring nodes
+    for (int i = 0; i < MAP_SIZE; ++i) {
+        for (int j = 0; j < MAP_SIZE; ++j) {
+            if (map_[i][j] != 'w') {
+                int current_index = node_map[{i, j}];
+
+                // Check the right neighbor
+                if (j + 1 < MAP_SIZE && map_[i][j + 1] != 'w') {
+                    int right_index = node_map[{i, j + 1}];
+                    graph.add_edge(current_index, right_index);
+                }
+
+                // Check the bottom neighbor
+                if (i + 1 < MAP_SIZE && map_[i + 1][j] != 'w') {
+                    int bottom_index = node_map[{i + 1, j}];
+                    graph.add_edge(current_index, bottom_index);
+                }
+            }
+        }
+    }
+
+    return graph;
 }
