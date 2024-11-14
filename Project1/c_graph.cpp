@@ -42,7 +42,7 @@ std::vector<Node> c_graph::get_neighbors(const Node& node) const {
         int new_x = node.x + dir[0];
         int new_y = node.y + dir[1];
 
-        if (new_x >= 0 && new_x < nodes_.size() && new_y >= 0 && new_y < nodes_[0].size() && !nodes_[new_x][new_y].is_wall) {
+        if (new_x >= 0 && new_x < nodes_.size() && new_y >= 0 && new_y < nodes_[0].size()) {
             neighbors.push_back(nodes_[new_x][new_y]);
         }
     }
@@ -82,7 +82,7 @@ void c_graph::dfs(const Node& start) {
         });
 
         for (const auto& neighbor : neighbors) {
-            if (!visited[neighbor]) {
+            if (!visited[neighbor] && !neighbor.is_wall) {
                 stack.push(neighbor);
             }
         }
@@ -117,7 +117,7 @@ void c_graph::bfs(const Node& start) {
         }
 
         for (const auto& neighbor : get_neighbors(current)) {
-            if (!visited[neighbor]) {
+            if (!visited[neighbor] && !neighbor.is_wall) {
                 queue.push(neighbor);
             }
         }
