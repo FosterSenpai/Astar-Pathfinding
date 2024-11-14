@@ -24,9 +24,9 @@ void display_menu() {
  * @param map    - The DungeonMap object.
  * @param graph  - The Graph object.
  */
-void handle_user_input(int choice, DungeonMap& map, Graph& graph) {
+void handle_user_input(const int choice, DungeonMap& map, Graph& graph) {
 	switch (choice) {
-        case 1: {   // === Load a new map ===
+        case 1: { // === Load a new map ===
         		std::string filename;
         		std::cout << "Enter the filename to load: ";
 		        std::cin >> filename;
@@ -40,19 +40,19 @@ void handle_user_input(int choice, DungeonMap& map, Graph& graph) {
 		        break;
         }
 
-        case 2:     // === Perform DFS ===
+        case 2:   // === Perform DFS ===
             // TODO: Perform DFS 
             break;
 
-        case 3:     // === Perform BFS ===
+        case 3:   // === Perform BFS ===
             // TODO: Perform BFS
             break;
 
-        case 4:     // === Run A* algorithm ===
+        case 4:   // === Run A* algorithm ===
             // TODO: Run A* algorithm
             break;
 
-        case 5: {   // === Save current map === todo: make this make sense lmao. should just save 
+        case 5: { // === Save current map === todo: make this make sense lmao. should just save 
             std::string filename;
             std::cout << "Enter the filename to save: ";
             std::cin >> filename;
@@ -63,7 +63,7 @@ void handle_user_input(int choice, DungeonMap& map, Graph& graph) {
             }
             break;
         }
-        case 6:     // === Exit the program ===
+        case 6:   // === Exit the program ===
             exit(0);
         default:
             std::cout << "Invalid choice. Please try again.\n";
