@@ -3,15 +3,6 @@
 #include "c_dungeon_map.h"
 #include "c_graph.h"
 
-// Finally have a good clear console function.
-void clear_console() {
-#ifdef _WIN32
-    std::system("cls");
-#else
-    std::system("clear");
-#endif
-}
-
 void display_map(const c_dungeon_map& map) {
     map.display_map();
 }
@@ -109,8 +100,8 @@ void handle_user_input(const int choice, c_dungeon_map& map, c_graph& graph) {
 }
 
 int main() {
-    try {
-        // Create the Objects.
+	try {
+		// Create the Objects.
         c_dungeon_map map; // Initialize with an empty map
         c_graph graph;
 
@@ -140,6 +131,7 @@ int main() {
 
             handle_user_input(choice, map, graph);
         }
+
     } catch (const std::exception& e) {
         std::cerr << "Unhandled exception: " << e.what() << '\n';
         return 1;
