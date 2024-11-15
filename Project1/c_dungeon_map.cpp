@@ -106,28 +106,32 @@ void c_dungeon_map::display_map() const {
 }
 
 void c_dungeon_map::save_map(const std::string& new_filename) const {
-	// Specify the directory where you want to save the file
-	std::string save_directory = "maps/";
+    // Ensure the filename has a .txt extension
+    std::string filename = new_filename;
+    if (filename.find(".txt") == std::string::npos) {
+        filename += ".txt";
+    }
 
-	// Ensure the filename has a .txt extension
-	std::string full_path = save_directory + new_filename;
-	if (full_path.find('.') == std::string::npos) {
-		full_path += ".txt";
-	}
+    // Prepend the 'data/' directory to the filename
+    std::string filepath = "data/" + filename;
 
-	// Make the new file.
-	std::ofstream file(full_path);
-	if (!file.is_open()) {
-		throw std::runtime_error("Unable to create file");
-	}
+    // Open the file for writing, throw an exception if it fails.
+    std::ofstream file(filepath);
+    if (!file.is_open()) {
+        throw std::runtime_error("Unable to open file for writing");
+    }
 
-	// Write the map data to the new file.
-	for (const auto& row : map_) {
-		for (char cell : row) {
-			file << cell << ' ';
-		}
-		file << '\n';
-	}
+    // Write the map data to the file.
+    for (const auto& row : map_) {
+        for (char cell : row) {
+            file << cell << ' ';
+        }
+        file << '\n'; // Newline after each row.
+    }
+
+    // Close the file.
+    file.close();
+    std::cout << "Map saved successfully to " << filepath << '\n';
 }
 
 c_graph c_dungeon_map::to_graph() const {
@@ -156,4 +160,14 @@ std::pair<int, int> c_dungeon_map::get_end_node() const {
 		}
 	}
 	throw std::runtime_error("End node not found");
+}
+
+void c_dungeon_map::mark_path(const std::vector<std::pair<int, int>>& path) {
+    for (const auto& coord : path) {
+        int x = coord.first;
+        int y = coord.second;
+        if (map_[x][y] != 's' && map_[x][y] != 'x') {
+            map_[x][y] = 'p'; // Mark the path with 'p'
+        }
+    }
 }

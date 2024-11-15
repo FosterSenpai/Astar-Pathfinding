@@ -19,6 +19,12 @@ struct Node {
 	}
 };
 
+struct NodeComparator { // Custom comparator for the priority queue in A* algorithm.
+    bool operator()(const std::pair<Node, double>& a, const std::pair<Node, double>& b) const {
+        return a.second > b.second;
+    }
+};
+
 // Custom hash function for Node struct, to be able to use it as a key in an unordered_map.
 // Unordered map O(1) lookup time, map O(log n) lookup time.
 namespace std {
@@ -76,12 +82,13 @@ public:
 	 * @param start - The node to start the search from.
 	 */
 	void bfs(const Node& start);
-	/**
-	 * @brief Perform the A* algorithm to find the shortest path from the start node to the goal node.
-	 * @param start - The start node.
-	 * @param goal  - The goal node.
-	 */
-	void a_star(const Node& start, const Node& goal);
+    /**
+     * @brief Perform the A* algorithm to find the shortest path from the start node to the goal node.
+     * @param start - The start node.
+     * @param goal  - The goal node.
+     * @return A vector of pairs representing the path coordinates.
+     */
+    std::vector<std::pair<int, int>> a_star(const Node& start, const Node& goal);
 
 private:
 	std::vector<std::vector<Node>> nodes_;                        // 2D vector of nodes representing the map.
@@ -93,4 +100,20 @@ private:
 	 * @note      - This function is called by the constructor.
 	 */
 	void build_graph(const std::vector<std::vector<char>>& map);
+
+	/**
+     * @brief Reconstruct the path from the came_from map.
+     * @param came_from - Map of nodes and their predecessors.
+     * @param current - The current node.
+     * @return A vector of nodes representing the path.
+     */
+    std::vector<Node> reconstruct_path(const std::unordered_map<Node, Node>& came_from, Node current) const;
+
+    /**
+     * @brief Check if a move is valid (not cutting corners).
+     * @param current - The current node.
+     * @param neighbor - The neighbor node.
+     * @return True if the move is valid, false otherwise.
+     */
+    bool is_valid_move(const Node& current, const Node& neighbor) const;
 };

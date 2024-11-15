@@ -23,95 +23,96 @@ void display_menu() {
  * @param graph  - The Graph object.
  */
 void handle_user_input(const int choice, c_dungeon_map& map, c_graph& graph) {
-	switch (choice) {
-	case 1: { // === Load map ===
-		std::string filename;
-		std::cout << "Enter the filename to load: ";
-		std::getline(std::cin >> std::ws, filename); // Read the filename with leading whitespace ignored
-		std::cout << "Attempting to load file: " << filename << std::endl;
-		try {
-			// Load & verify the map, catching any exceptions.
-			map.load_map(filename);
-			std::cout << "Map loaded and verified successfully.\n";
-			graph = map.to_graph(); // Convert the map to a graph
-		}
-		catch (const std::exception& e) {
-			std::cerr << "Error loading map: " << e.what() << '\n';
-			map = c_dungeon_map();  // Load an empty map
-			graph = map.to_graph(); // Convert the empty map to a graph
-		}
-		break;
-	}
+    switch (choice) {
+    case 1: { // === Load map ===
+        std::string filename;
+        std::cout << "Enter the filename to load: ";
+        std::getline(std::cin >> std::ws, filename); // Read the filename with leading whitespace ignored
+        std::cout << "Attempting to load file: " << filename << std::endl;
+        try {
+            // Load & verify the map, catching any exceptions.
+            map.load_map(filename);
+            std::cout << "Map loaded and verified successfully.\n";
+            graph = map.to_graph(); // Convert the map to a graph
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Error loading map: " << e.what() << '\n';
+            map = c_dungeon_map();  // Load an empty map
+            graph = map.to_graph(); // Convert the empty map to a graph
+        }
+        break;
+    }
 
-	case 2: { // === DFS ===
-		try {
-			// Get the start node from the map.
-			auto start_pos = map.get_start_node();
-			Node start_node = graph.get_node(start_pos.first, start_pos.second);
-			// Perform the DFS.
-			graph.dfs(start_node);
-		}
-		catch (const std::exception& e) {
-			std::cerr << "Error performing DFS: " << e.what() << '\n';
-		}
-		break;
-	}
+    case 2: { // === DFS ===
+        try {
+            // Get the start node from the map.
+            auto start_pos = map.get_start_node();
+            Node start_node = graph.get_node(start_pos.first, start_pos.second);
+            // Perform the DFS.
+            graph.dfs(start_node);
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Error performing DFS: " << e.what() << '\n';
+        }
+        break;
+    }
 
-	case 3: { // === BFS ===
-		try {
-			// Get the start node from the map.
-			auto start_pos = map.get_start_node();
-			Node start_node = graph.get_node(start_pos.first, start_pos.second);
-			// Perform the BFS.
-			graph.bfs(start_node);
-		}
-		catch (const std::exception& e) {
-			std::cerr << "Error performing BFS: " << e.what() << '\n';
-		}
-		break;
-	}
+    case 3: { // === BFS ===
+        try {
+            // Get the start node from the map.
+            auto start_pos = map.get_start_node();
+            Node start_node = graph.get_node(start_pos.first, start_pos.second);
+            // Perform the BFS.
+            graph.bfs(start_node);
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Error performing BFS: " << e.what() << '\n';
+        }
+        break;
+    }
 
-	case 4: { // === A* algorithm ===
-		try {
-			// Get the start and end nodes from the map.
-			auto start_pos = map.get_start_node();
-			auto end_pos = map.get_end_node();
-			Node start_node = graph.get_node(start_pos.first, start_pos.second);
-			Node end_node = graph.get_node(end_pos.first, end_pos.second);
-			// Perform the A* algorithm.
-			graph.a_star(start_node, end_node);
-		}
-		catch (const std::exception& e) {
-			std::cerr << "Error running A* algorithm: " << e.what() << '\n';
-		}
-		break;
-	}
+    case 4: { // === A* algorithm ===
+        try {
+            // Get the start and end nodes from the map.
+            auto start_pos = map.get_start_node();
+            auto end_pos = map.get_end_node();
+            Node start_node = graph.get_node(start_pos.first, start_pos.second);
+            Node end_node = graph.get_node(end_pos.first, end_pos.second);
+            // Perform the A* algorithm.
+            std::vector<std::pair<int, int>> path = graph.a_star(start_node, end_node);
+            if (!path.empty()) {
+                // Mark the path on the map.
+                map.mark_path(path);
+            } else {
+                std::cout << "No path found!" << std::endl;
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Error running A* algorithm: " << e.what() << '\n';
+        }
+        break;
+    }
 
-	case 5: { // === Save map ===
+    case 5: { // === Save map ===
+        try {
+            // Get the filename from the user.
+            std::string save_filename;
+            std::cout << "Enter the filename to save the map: ";
+            std::getline(std::cin >> std::ws, save_filename);
 
-		// Get the filename from the user.
-		std::string save_filename;
-		std::cout << "Enter the filename to save as: ";
-		std::getline(std::cin >> std::ws, save_filename);
+            map.save_map(save_filename);
+        } catch (const std::exception& e) {
+            std::cerr << "Error saving map: " << e.what() << '\n';
+        }
+        break;
+    }
 
-		// Save with the specified filename, catching any exceptions.
-		try { 
-			map.save_map(save_filename);
-			std::cout << "Map saved successfully as " << save_filename << ".\n";
-		}
-		catch (const std::exception& e) {
-			std::cerr << "Error saving map: " << e.what() << '\n';
-		}
-		break;
-	}
+    case 6:   // === Exit ===
+        std::cout << "Exiting program.\n";
+        exit(0);
 
-	case 6:   // === Exit ===
-		std::cout << "Exiting program.\n";
-		exit(0);
-
-	default:
-		std::cout << "Invalid choice. Please try again.\n";
-	}
+    default:
+        std::cout << "Invalid choice. Please try again.\n";
+    }
 }
 
 int main() {

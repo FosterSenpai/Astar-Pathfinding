@@ -66,6 +66,11 @@ public:
 	 * @return A pair of integers representing the end node position.
 	 */
 	std::pair<int, int> get_end_node() const;
+	/**
+     * @brief Mark the path on the map with the character 'p'.
+     * @param path - A vector of pairs representing the path coordinates.
+     */
+    void mark_path(const std::vector<std::pair<int, int>>& path);
 
 private:
 	std::vector<std::vector<char>> map_; // Map data stored as a 2D vector.

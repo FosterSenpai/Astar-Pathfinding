@@ -1,6 +1,7 @@
 ﻿#include "c_graph.h"
 #include <iostream>
 #include <limits>
+#include <unordered_set>
 
 Node c_graph::get_node(int x, int y) const {
 	// Check if the coordinates are within the bounds of the graph.
@@ -36,6 +37,29 @@ void c_graph::build_graph(const std::vector<std::vector<char>>& map) {
 			}
 		}
 	}
+}
+
+std::vector<Node> c_graph::reconstruct_path(const std::unordered_map<Node, Node>& came_from, Node current) const {
+    std::vector<Node> path;
+    while (came_from.find(current) != came_from.end()) {
+        path.push_back(current);
+        current = came_from.at(current);
+    }
+    path.push_back(current);
+    std::reverse(path.begin(), path.end());
+    return path;
+}
+
+bool c_graph::is_valid_move(const Node& current, const Node& neighbor) const {
+    int dx = neighbor.x - current.x;
+    int dy = neighbor.y - current.y;
+
+    if (std::abs(dx) + std::abs(dy) == 2) { // Diagonal move
+        if (nodes_[current.x + dx][current.y].is_wall || nodes_[current.x][current.y + dy].is_wall) {
+            return false;
+        }
+    }
+    return true;
 }
 
 std::vector<Node> c_graph::get_neighbors(const Node& node) const {
@@ -140,6 +164,49 @@ void c_graph::bfs(const Node& start) {
 	std::cout << "\n";
 }
 
-void c_graph::a_star(const Node& start, const Node& goal) {
-	// Implement A* algorithm here
+std::vector<std::pair<int, int>> c_graph::a_star(const Node& start, const Node& goal) {
+    std::priority_queue<std::pair<Node, double>, std::vector<std::pair<Node, double>>, NodeComparator> open_set;
+    std::unordered_map<Node, Node> came_from;
+    std::unordered_map<Node, double> g_score;
+    std::unordered_map<Node, double> f_score;
+    std::unordered_set<Node> closed_set;
+
+    open_set.emplace(start, 0.0);
+    g_score[start] = 0.0;
+    f_score[start] = manhattan_distance(start, goal);
+
+    while (!open_set.empty()) {
+        Node current = open_set.top().first;
+        open_set.pop();
+
+        if (current == goal) {
+            std::vector<Node> path_nodes = reconstruct_path(came_from, current);
+            std::vector<std::pair<int, int>> path;
+            for (const auto& node : path_nodes) {
+                path.emplace_back(node.x, node.y);
+            }
+            std::cout << "Path found!" << std::endl;
+            return path;
+        }
+
+        closed_set.insert(current);
+
+        for (const auto& neighbor : get_neighbors(current)) {
+            if (closed_set.find(neighbor) != closed_set.end() || neighbor.is_wall || !is_valid_move(current, neighbor)) {
+                continue;
+            }
+
+            double tentative_g_score = g_score[current] + euclidean_distance(current, neighbor);
+
+            if (g_score.find(neighbor) == g_score.end() || tentative_g_score < g_score[neighbor]) {
+                came_from[neighbor] = current;
+                g_score[neighbor] = tentative_g_score;
+                f_score[neighbor] = g_score[neighbor] + manhattan_distance(neighbor, goal);
+                open_set.emplace(neighbor, f_score[neighbor]);
+            }
+        }
+    }
+
+    std::cout << "No path found!" << std::endl;
+    return {};
 }
