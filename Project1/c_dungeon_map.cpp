@@ -52,6 +52,23 @@ void c_dungeon_map::load_map(const std::string& filename) {
             file >> map_[i][j];              // Read char into map_.
         }
     }
+
+    // Verify the map after loading
+    try {
+        verify_map();
+    } catch (const std::exception& e) {
+        // If verification fails, reset to an empty map and rethrow the exception
+        map_.clear();
+        map_.resize(MAP_SIZE, std::vector<char>(MAP_SIZE, '.'));
+        // Set walls around the outside.
+        for (int i = 0; i < MAP_SIZE; ++i) {
+            map_[0][i] = 'w'; // Top row.
+            map_[MAP_SIZE - 1][i] = 'w'; // Bottom row.
+            map_[i][0] = 'w'; // Left column.
+            map_[i][MAP_SIZE - 1] = 'w'; // Right column.
+        }
+        throw;
+    }
 }
 
 void c_dungeon_map::verify_map() const
