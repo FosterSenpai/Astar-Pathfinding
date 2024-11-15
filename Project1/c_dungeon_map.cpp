@@ -4,6 +4,16 @@
 #include <fstream>
 #include <stdexcept>
 #include <unordered_set>
+#include <vector>
+#include <string>
+
+// ANSI escape codes for colors.
+const std::string RESET = "\033[0m";
+const std::string GREY = "\033[90m";
+const std::string GREEN = "\033[32m";
+const std::string YELLOW = "\033[33m";
+const std::string BLACK = "\033[30m";
+
 
 constexpr int MAP_SIZE = 20;
 
@@ -95,25 +105,45 @@ void c_dungeon_map::verify_map() const
 }
 
 void c_dungeon_map::display_map() const {
-	// Iterate over each row in the map.
-	for (const auto& row : map_) {
-		// Print cell char + padding for each cell in the row.
-		for (char cell : row) {
-			std::cout << cell << ' ';
-		}
-		std::cout << '\n'; // Newline after each row.
-	}
+    // Iterate over each row in the map.
+    for (const auto& row : map_) {
+        // Print cell char + padding for each cell in the row.
+        for (char cell : row) {
+            // Coloring.
+            switch (cell) {
+                case 's':
+                case 'x':
+                case 'p':
+                    std::cout << GREEN << cell << ' ' << RESET;
+                    break;
+                case 'w':
+                    std::cout << GREY << cell << ' ' << RESET;
+                    break;
+                case '.':
+                    std::cout << BLACK << cell << ' ' << RESET;
+                    break;
+                default:
+                    if (cell >= 'a' && cell <= 'j') {
+                        std::cout << YELLOW << cell << ' ' << RESET;
+                    } else {
+                        std::cout << cell << ' ';
+                    }
+                    break;
+            }
+        }
+        std::cout << '\n'; // Newline after each row.
+    }
 }
 
 void c_dungeon_map::save_map(const std::string& new_filename) const {
-    // Ensure the filename has a .txt extension
+    // Ensure the filename ends with .txt
     std::string filename = new_filename;
     if (filename.find(".txt") == std::string::npos) {
         filename += ".txt";
     }
 
-    // Prepend the 'data/' directory to the filename
-    std::string filepath = "data/" + filename;
+    // Prepend the 'maps/' directory to the filename
+    std::string filepath = "maps/" + filename;
 
     // Open the file for writing, throw an exception if it fails.
     std::ofstream file(filepath);
@@ -126,12 +156,11 @@ void c_dungeon_map::save_map(const std::string& new_filename) const {
         for (char cell : row) {
             file << cell << ' ';
         }
-        file << '\n'; // Newline after each row.
+        file << '\n';
     }
 
     // Close the file.
     file.close();
-    std::cout << "Map saved successfully to " << filepath << '\n';
 }
 
 c_graph c_dungeon_map::to_graph() const {
@@ -163,11 +192,13 @@ std::pair<int, int> c_dungeon_map::get_end_node() const {
 }
 
 void c_dungeon_map::mark_path(const std::vector<std::pair<int, int>>& path) {
+    // Iterate over the path coordinates and update the map.
     for (const auto& coord : path) {
         int x = coord.first;
         int y = coord.second;
+        // Update the cells between the start and end points.
         if (map_[x][y] != 's' && map_[x][y] != 'x') {
-            map_[x][y] = 'p'; // Mark the path with 'p'
+            map_[x][y] = 'p';
         }
     }
 }

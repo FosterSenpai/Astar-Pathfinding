@@ -1,12 +1,23 @@
-﻿#pragma once
+﻿// /***********************************************************************
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+// (c) 2024 Media Design School
+// File Name : c_graph.h
+// Description : Methods for building a graph from a map and performing searches on the graph.
+// Author : Foster Rae
+// Mail : Foster.Rae@mds.ac.nz
+// ************************************************************************/
+#pragma once
 #include <vector>
-#include <unordered_map>
+#include <unordered_map> // Using unordered_map instead of map for better performance. on average, O(1) for insertion, deletion, and search.
 #include <cmath>
 #include <queue>
 #include <stack>
 #include <algorithm>
 
-struct Node {
+struct Node { // Struct to represent a node in the graph.
 	int x, y;
 	bool is_item;
 	bool is_wall;
@@ -26,11 +37,10 @@ struct NodeComparator { // Custom comparator for the priority queue in A* algori
 };
 
 // Custom hash function for Node struct, to be able to use it as a key in an unordered_map.
-// Unordered map O(1) lookup time, map O(log n) lookup time.
 namespace std {
 	template <>
 	struct hash<Node> { // Hash function for Node struct.
-		std::size_t operator()(const Node& node) const noexcept{					   // Takes a Node object as input.
+		std::size_t operator()(const Node& node) const noexcept{			   // Takes a Node object as input.
 			return std::hash<int>()(node.x) ^ (std::hash<int>()(node.y) << 1); // Hash the x and y coordinates.
 		}
 	};
@@ -104,14 +114,14 @@ private:
 	/**
      * @brief Reconstruct the path from the came_from map.
      * @param came_from - Map of nodes and their predecessors.
-     * @param current - The current node.
+     * @param current   - The current node.
      * @return A vector of nodes representing the path.
      */
     std::vector<Node> reconstruct_path(const std::unordered_map<Node, Node>& came_from, Node current) const;
 
     /**
      * @brief Check if a move is valid (not cutting corners).
-     * @param current - The current node.
+     * @param current  - The current node.
      * @param neighbor - The neighbor node.
      * @return True if the move is valid, false otherwise.
      */

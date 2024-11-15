@@ -1,6 +1,5 @@
 ﻿#include "c_graph.h"
 #include <iostream>
-#include <limits>
 #include <unordered_set>
 
 Node c_graph::get_node(int x, int y) const {
@@ -41,24 +40,31 @@ void c_graph::build_graph(const std::vector<std::vector<char>>& map) {
 
 std::vector<Node> c_graph::reconstruct_path(const std::unordered_map<Node, Node>& came_from, Node current) const {
     std::vector<Node> path;
+
+	// Traverse the came_from map from the goal and move backwards to the start.
     while (came_from.find(current) != came_from.end()) {
-        path.push_back(current);
-        current = came_from.at(current);
+        path.push_back(current);         // Add the current node to the path.
+        current = came_from.at(current); // Move to the previous node in the path.
     }
-    path.push_back(current);
-    std::reverse(path.begin(), path.end());
+
+    path.push_back(current); // Add the start node to the path.
+    std::reverse(path.begin(), path.end()); // Reverse the path to get the correct order.
     return path;
 }
 
 bool c_graph::is_valid_move(const Node& current, const Node& neighbor) const {
+	// Difference in x and y coordinates between the current and neighbor nodes.
     int dx = neighbor.x - current.x;
     int dy = neighbor.y - current.y;
 
-    if (std::abs(dx) + std::abs(dy) == 2) { // Diagonal move
-        if (nodes_[current.x + dx][current.y].is_wall || nodes_[current.x][current.y + dy].is_wall) {
+	// Check if the move is valid (not cutting corners)
+    if (std::abs(dx) + std::abs(dy) == 2) { // Absolute difference of 2 means we are moving diagonally.
+		// If there is a wall blocking the diagonal move, it is invalid.
+        if (nodes_[current.x + dx][current.y].is_wall || nodes_[current.x][current.y + dy].is_wall) { 
             return false;
         }
     }
+	// If the move is not diagonal or the diagonal move is valid, return true.
     return true;
 }
 
@@ -165,48 +171,64 @@ void c_graph::bfs(const Node& start) {
 }
 
 std::vector<std::pair<int, int>> c_graph::a_star(const Node& start, const Node& goal) {
-    std::priority_queue<std::pair<Node, double>, std::vector<std::pair<Node, double>>, NodeComparator> open_set;
-    std::unordered_map<Node, Node> came_from;
-    std::unordered_map<Node, double> g_score;
-    std::unordered_map<Node, double> f_score;
-    std::unordered_set<Node> closed_set;
+    std::priority_queue<std::pair<Node, double>, std::vector<std::pair<Node, double>>, NodeComparator> open_set; // Priority queue for nodes to be evaluated, ordered by f_score.
+    std::unordered_map<Node, Node> came_from; // Map to store the most efficient previous step for each node.
+    std::unordered_map<Node, double> g_score; // Map to store the cost of the cheapest path from start to each node.
+    std::unordered_map<Node, double> f_score; // Map to store the estimated total cost from start to goal through each node.
+    std::unordered_set<Node> closed_set;      // Set to store nodes that have already been evaluated.
 
+    // Initialize the start node.
     open_set.emplace(start, 0.0);
     g_score[start] = 0.0;
     f_score[start] = manhattan_distance(start, goal);
 
+    // Continue until the open set is empty.
     while (!open_set.empty()) {
+        // Get the node with the lowest f_score.
         Node current = open_set.top().first;
         open_set.pop();
 
+        // Check if the current node is the goal.
         if (current == goal) {
+            // If the goal is reached, reconstruct the path and return it.
             std::vector<Node> path_nodes = reconstruct_path(came_from, current);
+
+            // Convert the nodes to a vector of pairs representing the path coordinates.
             std::vector<std::pair<int, int>> path;
             for (const auto& node : path_nodes) {
                 path.emplace_back(node.x, node.y);
             }
+
             std::cout << "Path found!" << std::endl;
             return path;
         }
 
+        // If the current node is not the goal, add it to the closed set.
         closed_set.insert(current);
 
+        // Iterate over the neighbors of the current node.
         for (const auto& neighbor : get_neighbors(current)) {
+            // Skip if the neighbor is in the closed set, is a wall, or the move is invalid.
             if (closed_set.find(neighbor) != closed_set.end() || neighbor.is_wall || !is_valid_move(current, neighbor)) {
                 continue;
             }
 
+            // Calculate the tentative g_score.
             double tentative_g_score = g_score[current] + euclidean_distance(current, neighbor);
 
+            // If the neighbor is not in the g_score map or the tentative g_score is less than the current g_score.
             if (g_score.find(neighbor) == g_score.end() || tentative_g_score < g_score[neighbor]) {
+                // Update the path and scores.
                 came_from[neighbor] = current;
                 g_score[neighbor] = tentative_g_score;
                 f_score[neighbor] = g_score[neighbor] + manhattan_distance(neighbor, goal);
+                // Add the neighbor to the open set.
                 open_set.emplace(neighbor, f_score[neighbor]);
             }
         }
     }
 
+    // If no path is found, return an empty vector.
     std::cout << "No path found!" << std::endl;
     return {};
 }

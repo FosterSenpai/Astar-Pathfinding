@@ -92,19 +92,20 @@ void handle_user_input(const int choice, c_dungeon_map& map, c_graph& graph) {
         break;
     }
 
-    case 5: { // === Save map ===
-        try {
-            // Get the filename from the user.
-            std::string save_filename;
-            std::cout << "Enter the filename to save the map: ";
-            std::getline(std::cin >> std::ws, save_filename);
-
-            map.save_map(save_filename);
-        } catch (const std::exception& e) {
-            std::cerr << "Error saving map: " << e.what() << '\n';
-        }
-        break;
-    }
+	case 5: { // === Save map ===
+	    try {
+	        // Get the filename from the user.
+	        std::string save_filename;
+	        std::cout << "Enter the filename to save the map: ";
+	        std::getline(std::cin >> std::ws, save_filename);
+            // Save with provided filename.
+	        map.save_map(save_filename);
+	        std::cout << "Map saved successfully.\n";
+	    } catch (const std::exception& e) {
+	        std::cerr << "Error saving map: " << e.what() << '\n';
+	    }
+	    break;
+	}
 
     case 6:   // === Exit ===
         std::cout << "Exiting program.\n";
@@ -144,7 +145,7 @@ int main() {
 
 			// Clear the input buffer to remove any leftover characters.
 			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
+            // Handle the user's choice.
 			handle_user_input(choice, map, graph);
 		}
 	}

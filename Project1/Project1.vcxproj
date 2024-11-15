@@ -135,6 +135,9 @@
     <ClInclude Include="c_dungeon_map.h" />
     <ClInclude Include="c_graph.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
